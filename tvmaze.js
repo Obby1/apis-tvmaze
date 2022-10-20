@@ -1,4 +1,6 @@
 "use strict";
+// declare global variables show?
+
 
 const MISSING_IMAGE_URL = "https://tinyurl.com/tv-missing";
 
@@ -24,11 +26,11 @@ async function getShowsByTerm(term) {
       id: show.id,
       name: show.name,
       summary: show.summary,
-      image: show.image.medium ? show.image.medium :MISSING_IMAGE_URL,
+      image: show.image ? show.image.medium :MISSING_IMAGE_URL,
     };
   });
 
-  return shows;//return show.data
+  return shows;
   // console.log(shows);
 
 }
@@ -42,14 +44,16 @@ async function getShowsByTerm(term) {
 
 function populateShows(shows) {
   $showsList.empty();
-  console.log(shows);
+  // console.log(`populate shows function ${shows}`);
+  // console.log(shows);
   for (let show of shows) {
-    console.log(show.name);
+    // console.log(`for loop show is ${show.name}`);
+    console.log(show.image);
     const $show = $(
         `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
            <img 
-              src=${show.image.medium}
+              src=${show.image}
               alt="" 
               class="w-25 mr-3">
            <div class="media-body">
@@ -72,10 +76,12 @@ function populateShows(shows) {
  */
 
 async function searchForShowAndDisplay() {
-  const term = $("#searchForm-term").val();
+  console.log(`search function clicked`)
+  const term = $("#search-query").val();
+  console.log(`const term is ${term}`);
   const shows = await getShowsByTerm(term);
   // console.log (term);
-  console.log(shows);
+  console.log(`shows var = ${shows}`);
 
   $episodesArea.hide();
   populateShows(shows);
