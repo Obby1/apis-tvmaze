@@ -25,7 +25,7 @@ async function getShowsByTerm(term) {
       return {
       id: show.id,
       name: show.name,
-      summary: show.summary,
+      summary: show.summary ? show.summary: `missing summary data`,
       image: show.image ? show.image.medium :MISSING_IMAGE_URL,
     };
   });
@@ -48,7 +48,7 @@ function populateShows(shows) {
   // console.log(shows);
   for (let show of shows) {
     // console.log(`for loop show is ${show.name}`);
-    console.log(show.image);
+    // console.log(show.image);
     const $show = $(
         `<div data-show-id="${show.id}" class="Show col-md-12 col-lg-6 mb-4">
          <div class="media">
@@ -59,7 +59,7 @@ function populateShows(shows) {
            <div class="media-body">
              <h5 class="text-primary">${show.name}</h5>
              <div><small>${show.summary}</small></div>
-             <button class="btn btn-outline-light btn-sm Show-getEpisodes">
+             <button class="get-episodes">
                Episodes
              </button>
            </div>
@@ -67,8 +67,17 @@ function populateShows(shows) {
        </div>
       `);
 
+    // $(`.episodes-btn`).on("click", function(){
+    //   console.log(show);
+    // })
     $showsList.append($show);  }
+  
 }
+
+// $(`#shows-list`).on("click", ".episodes-btn", function(evt){
+//   console.log(evt.target);
+// // populateEpisodes(getEpisodesOfShow($(this).))
+// });
 
 
 /** Handle search form submission: get shows from API and display.
@@ -81,7 +90,7 @@ async function searchForShowAndDisplay() {
   console.log(`const term is ${term}`);
   const shows = await getShowsByTerm(term);
   // console.log (term);
-  console.log(`shows var = ${shows}`);
+  // console.log(`shows var = ${shows}`);
 
   $episodesArea.hide();
   populateShows(shows);
@@ -105,13 +114,61 @@ async function getEpisodesOfShow(id) {
     season: episode.season,
     number: episode.number,
   }));
-
+// console.log(episodes);
   return episodes;
+  //returns array of objects
 }
 
 /** Write a clear docstring for this function... */
 
-// function populateEpisodes(episodes) { }
+function populateEpisodes(episodes) { 
+  const $episodesList = $("#episodes-list");
+  $episodesList.empty();
+// console.log(episodes);
+  for (let episode of episodes){
+    // console.log(episode);
+const $episode = $(
+  `
+  <li>${episode.name} (season ${episode.season}, episode ${episode.number})
+  </li>
+ 
+  `);
+  $episodesList.append($episode);
+// $episodesArea.append($episode);
+
+  }
+
+  $("#episodes-area").show();
+}
+
+// add event listener to shows list div
+// when get episodes button is clicked, run handeclick function
+
+$("#shows-list").on("click", ".get-episodes", async function handleEpisodeClick(evt) {
+  // console.log(`episodes button clicked ${evt.target}`)
+  // collect show ID from show data
+  let showId = $(evt.target).closest(".Show").data("show-id");
+  // run getEpisodesOfShow function to collect episodes from API
+  let episodes = await getEpisodesOfShow(showId);
+  // run populateEpisodes function to place episodes as LIs in UL in episodes area section
+  populateEpisodes(episodes);
+});
+
+//add an event listern that will run getEpisodes function and pass that data
+//to populateEpisodes which will ammend the episodesArea.
+
+
+// async function searchForEpisodeAndDisplay() {
+//   // console.log(`search function clicked`)
+//   const episodeId = $("#search-query").val();
+//   // console.log(`const term is ${term}`);
+//   const shows = await getShowsByTerm(term);
+//   // console.log (term);
+//   console.log(`shows var = ${shows}`);
+
+//   // $episodesArea.hide();
+//   populateShows(shows);
+// }
 
 
 // Original function below: 
@@ -229,3 +286,8 @@ async function getEpisodesOfShow(id) {
 
 //     $showsList.append($show);  }
 // }
+
+
+/* <button class="btn btn-outline-light btn-sm Show-getEpisodes">
+               Episodes
+             </button> */
